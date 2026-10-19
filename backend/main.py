@@ -36,14 +36,24 @@ async def generate_game(request: GameRequest):
         print(f"🚨 Decode Error: {e}")
         raise HTTPException(status_code=400, detail="Invalid image format.")
 
-    # 🚀 YAHAN PROMPT UPDATE KIYA HAI MOBILE TOUCH KE LIYE
+    # 🚀 ULTIMATE UNIVERSAL GAME ENGINE PROMPT
     prompt = """
-    You are an expert game developer. Convert this hand-drawn sketch into a fully functional, playable 2D web game using HTML, CSS, and JavaScript. 
-    1. Use the HTML5 <canvas> element or standard DOM elements.
-    2. Add basic physics and collision detection based on what the sketch implies.
-    3. CRITICAL: Make the game MOBILE-FRIENDLY. You MUST implement touch controls (touchstart, touchend) or provide visible on-screen buttons for movement/jumping. Keyboard controls can be included as a fallback.
-    4. Make it colorful, engaging, and ensure the game canvas fits well within a mobile device screen layout.
-    5. Ensure ALL CSS and JavaScript are inline within a single HTML file.
+    You are an elite Game Developer and AI Game Engine. Your task is to deeply analyze this hand-drawn sketch, dynamically determine its genre, and build a flawless, fully playable 2D HTML5 game. 
+
+    Follow this Universal Game Framework STRICTLY:
+    1. GENRE & PHYSICS ANALYSIS: First, look at the layout. 
+       - If it's a side-scroller/platformer (like Mario): Apply gravity, ground collision, and jumping mechanics.
+       - If it's a top-down game (like Pac-Man, RPG, or Maze): Disable gravity, allow free 4-way movement (up/down/left/right), and set wall collisions.
+       - If it's a space/shooter or racing game: Apply constant forward momentum, projectile mechanics, or steering logic.
+    2. SMART OBJECT RECOGNITION: Identify ALL drawn elements and make them fully INTERACTIVE.
+       - Platforms/Walls: Solid collisions.
+       - Stairs/Ladders/Vines: If present, disable gravity when overlapping and allow vertical climbing.
+       - Hazards (Spikes, Lava, Monsters): Cause 'Game Over' on touch.
+       - Collectibles (Coins, Gems, Stars): Increase score and disappear on touch.
+       - Goals (Doors, Flags, Trophies): Trigger 'You Win' screen.
+    3. ADAPTIVE MOBILE CONTROLS (CRITICAL): You MUST build intuitive on-screen touch buttons or a virtual joystick that matches the genre. For platformers: Left, Right, Jump, Climb. For top-down: 4-way D-Pad. Bind touch events (touchstart, touchend) to these visible buttons. Keyboard keys (arrows/WASD) must also work as a fallback.
+    4. GAME LOOP & UI: Include a proper game loop, score counter, Win/Loss states, and a 'Restart' button. Make the visuals colorful and adapt the canvas to fit beautifully on mobile screens.
+    5. Ensure ALL CSS and JavaScript are strictly inline within a single HTML file.
     6. Return ONLY the valid HTML code starting with <!DOCTYPE html>. Do NOT include markdown formatting like ```html.
     """
 
