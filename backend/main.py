@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,7 +15,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Fetching API Keys from Render
 KEYS_ENV = os.getenv("GEMINI_API_KEYS", "")
 API_KEYS = [k.strip() for k in KEYS_ENV.split(",") if k.strip()]
 
@@ -28,19 +26,16 @@ async def generate_game(request: GameRequest):
     if not API_KEYS:
         raise HTTPException(status_code=500, detail="API keys are not configured.")
 
-    # 1. Clean Base64 string
     img_data = request.image
     if "," in img_data:
         img_data = img_data.split(",")[1]
         
-    # 2. Convert string to raw bytes
     try:
         image_bytes = base64.b64decode(img_data)
     except Exception as e:
         print(f"🚨 Decode Error: {e}")
         raise HTTPException(status_code=400, detail="Invalid image format.")
 
-    # 3. GAME GENERATION PROMPT 🎮
     prompt = """
     You are an expert game developer. Convert this hand-drawn sketch into a fully functional, playable 2D web game using HTML, CSS, and JavaScript. 
     1. Use the HTML5 <canvas> element or standard DOM elements.
@@ -54,9 +49,24 @@ async def generate_game(request: GameRequest):
         try:
             print(f"Trying API Key {index + 1}...")
             genai.configure(api_key=key)
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
             
-            # API Call using raw bytes
+            # 🔍 Bhai tera idea: ListModels call karke sabse best available nikal rahe hain
+            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            print(f"✅ Google allow kar raha hai yeh models: {available_models}")
+            
+            # Smart Model Fallback System
+            chosen_model = 'gemini-pro-vision' # Purana default
+            if 'models/gemini-1.5-flash-latest' in available_models:
+                chosen_model = 'gemini-1.5-flash-latest'
+            elif 'models/gemini-1.5-flash' in available_models:
+                chosen_model = 'gemini-1.5-flash'
+            elif 'models/gemini-1.5-pro' in available_models:
+                chosen_model = 'gemini-1.5-pro'
+
+            print(f"🚀 Humne select kiya: {chosen_model}")
+            
+            model = genai.GenerativeModel(chosen_model)
+            
             response = model.generate_content([
                 prompt, 
                 {"mime_type": "image/jpeg", "data": image_bytes}
@@ -64,7 +74,6 @@ async def generate_game(request: GameRequest):
             
             final_code = response.text.strip()
             
-            # Remove Markdown tags
             if final_code.startswith("```html"):
                 final_code = final_code.replace("```html", "", 1)
             if final_code.endswith("```"):
@@ -74,7 +83,6 @@ async def generate_game(request: GameRequest):
 
         except Exception as e:
             error_msg = str(e).lower()
-            # 4. Actual Error Logging for Render Dashboard
             print(f"🚨 Key {index + 1} Error: {e}") 
             
             if "429" in error_msg or "quota" in error_msg or "exhausted" in error_msg:
