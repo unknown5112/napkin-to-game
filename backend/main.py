@@ -54,7 +54,7 @@ async def generate_game(request: GameRequest):
         try:
             print(f"Trying API Key {index + 1}...")
             genai.configure(api_key=key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-1.5-flash-latest')
             
             # API Call using raw bytes
             response = model.generate_content([
