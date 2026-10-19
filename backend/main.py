@@ -36,25 +36,19 @@ async def generate_game(request: GameRequest):
         print(f"🚨 Decode Error: {e}")
         raise HTTPException(status_code=400, detail="Invalid image format.")
 
-    # 🚀 ULTIMATE UNIVERSAL GAME ENGINE PROMPT
+    # 🚀 THE ULTIMATE PROMPT: Smart UI, No Blank Screens, Ladder Fix, Camera Tracking
     prompt = """
-    You are an elite Game Developer and AI Game Engine. Your task is to deeply analyze this hand-drawn sketch, dynamically determine its genre, and build a flawless, fully playable 2D HTML5 game. 
-
-    Follow this Universal Game Framework STRICTLY:
-    1. GENRE & PHYSICS ANALYSIS: First, look at the layout. 
-       - If it's a side-scroller/platformer (like Mario): Apply gravity, ground collision, and jumping mechanics.
-       - If it's a top-down game (like Pac-Man, RPG, or Maze): Disable gravity, allow free 4-way movement (up/down/left/right), and set wall collisions.
-       - If it's a space/shooter or racing game: Apply constant forward momentum, projectile mechanics, or steering logic.
-    2. SMART OBJECT RECOGNITION: Identify ALL drawn elements and make them fully INTERACTIVE.
-       - Platforms/Walls: Solid collisions.
-       - Stairs/Ladders/Vines: If present, disable gravity when overlapping and allow vertical climbing.
-       - Hazards (Spikes, Lava, Monsters): Cause 'Game Over' on touch.
-       - Collectibles (Coins, Gems, Stars): Increase score and disappear on touch.
-       - Goals (Doors, Flags, Trophies): Trigger 'You Win' screen.
-    3. ADAPTIVE MOBILE CONTROLS (CRITICAL): You MUST build intuitive on-screen touch buttons or a virtual joystick that matches the genre. For platformers: Left, Right, Jump, Climb. For top-down: 4-way D-Pad. Bind touch events (touchstart, touchend) to these visible buttons. Keyboard keys (arrows/WASD) must also work as a fallback.
-    4. GAME LOOP & UI: Include a proper game loop, score counter, Win/Loss states, and a 'Restart' button. Make the visuals colorful and adapt the canvas to fit beautifully on mobile screens.
-    5. Ensure ALL CSS and JavaScript are strictly inline within a single HTML file.
-    6. Return ONLY the valid HTML code starting with <!DOCTYPE html>. Do NOT include markdown formatting like ```html.
+    You are an elite Game Developer. Convert this hand-drawn sketch into a flawlessly playable 2D HTML5 game. 
+    Follow this STRICT Universal Framework:
+    1. ANTI-BLANK GUARANTEE: You MUST generate visible game objects, a clear player character, ground/platforms, and a contrasting background. Never output an empty or broken canvas.
+    2. SMART DEVICE DETECTION & UI: Use JavaScript (e.g., `'ontouchstart' in window`) to detect the device type dynamically.
+       - IF MOBILE/TABLET: Render large, visible on-screen touch controls (Left, Right, Up/Jump, Down) and bind touch events. The game can start immediately.
+       - IF DESKTOP/PC: Completely HIDE all on-screen touch buttons. Instead, show a "How to Play" overlay screen at startup that maps out the keyboard controls (e.g., Arrow Keys to move, Space to jump). Include a clear "Start Game" button on this overlay that dismisses the screen and begins the game loop.
+    3. GENRE & PHYSICS: Apply gravity for platformers, or 4-way top-down movement if the sketch implies a maze/RPG.
+    4. LADDER/CLIMBING LOGIC (CRITICAL FIX): If ladders/stairs exist, implement a strict state machine. If the player intersects a ladder AND presses UP or DOWN, set `isClimbing = true`. While climbing, set gravity and Y-velocity to 0, and move Y manually based on input. Restore gravity when jumping or leaving the ladder.
+    5. CAMERA TRACKING (PRO FEATURE): If the generated level is wider/taller than the canvas view, implement a dynamic camera system that keeps the player centered on the screen.
+    6. Ensure ALL CSS and JavaScript are strictly inline within a single HTML file.
+    7. Return ONLY the valid HTML code starting with <!DOCTYPE html>. Do NOT include markdown formatting like ```html.
     """
 
     for index, key in enumerate(API_KEYS):
@@ -63,7 +57,6 @@ async def generate_game(request: GameRequest):
             genai.configure(api_key=key)
             
             chosen_model = 'gemini-3.5-flash'
-            print(f"🚀 Humne select kiya: {chosen_model}")
             
             model = genai.GenerativeModel(chosen_model)
             
