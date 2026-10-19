@@ -6,7 +6,7 @@
     <title>Napkin-to-Game 🎮</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom scrollbar */
+        /* Custom scrollbar for game frame */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #1f2937; }
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
@@ -30,17 +30,24 @@
         <!-- Upload & Controls Section -->
         <div class="bg-gray-800 p-6 md:p-8 rounded-2xl border border-gray-700 shadow-2xl">
             
-            <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="previewImage(event)">
-            
-            <div class="flex gap-4 mb-6">
-                <button onclick="document.getElementById('imageInput').click()" 
-                    class="w-full py-3.5 bg-gray-700 hover:bg-gray-600 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-inner">
-                    📸 Upload Game Sketch
+            <!-- Hidden Inputs for Camera and Gallery -->
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="previewImage(event)">
+            <input type="file" id="galleryInput" accept="image/*" class="hidden" onchange="previewImage(event)">
+
+            <!-- Upload Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <button onclick="document.getElementById('cameraInput').click()" 
+                    class="flex-1 py-3.5 bg-gray-700 hover:bg-gray-600 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-inner">
+                    📸 Take a Photo
+                </button>
+                <button onclick="document.getElementById('galleryInput').click()" 
+                    class="flex-1 py-3.5 bg-gray-700 hover:bg-gray-600 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-inner">
+                    📁 Choose from Gallery
                 </button>
             </div>
             
             <!-- Image Preview -->
-            <div id="previewContainer" class="hidden mb-6">
+            <div id="previewContainer" class="hidden mb-6 flex justify-center">
                 <img id="imagePreview" class="w-full max-h-72 object-contain rounded-xl border-2 border-dashed border-gray-600 bg-gray-900 p-2">
             </div>
 
@@ -55,11 +62,11 @@
         <div id="gameContainer" class="hidden bg-gray-800 p-4 md:p-6 rounded-2xl border border-gray-700 shadow-2xl mb-12">
             <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4">
                 <h2 class="font-bold text-xl text-emerald-400 flex items-center gap-2">
-                    🕹️ Play Area (Click inside to control)
+                    🕹️ Play Area <span class="text-sm font-normal text-gray-400 ml-2">(Click inside to control)</span>
                 </h2>
             </div>
             
-            <!-- Where the magic happens (sandbox added for games) -->
+            <!-- Sandbox iframe for executing game code safely -->
             <div class="relative w-full rounded-xl overflow-hidden bg-white border-2 border-gray-600" style="height: 60vh; min-height: 500px;">
                 <iframe id="gameFrame" class="absolute inset-0 w-full h-full border-0" sandbox="allow-scripts allow-same-origin"></iframe>
             </div>
@@ -91,7 +98,7 @@
             }
         }
 
-        // Image ko chota karna zaroori hai taaki Render par jaldi upload ho aur API timeout na ho
+        // Image compression function
         function compressImage(file, maxSize = 800) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -126,10 +133,10 @@
             });
         }
 
-        // Backend ko image bhejna aur Game HTML fetch karna
+        // Main API call function
         async function handleGenerateGame() {
             if (!selectedFile) {
-                alert("Please upload a sketch first!");
+                alert("Please upload or capture a sketch first!");
                 return;
             }
 
@@ -138,12 +145,12 @@
             const gameContainer = document.getElementById('gameContainer');
             const iframe = document.getElementById('gameFrame');
 
-            // Button ko loading state mein daalna
+            // Set loading state
             genBtn.disabled = true;
             genBtn.classList.add('opacity-50', 'cursor-not-allowed');
             btnText.innerText = "Spawning Game... ⏳ (Takes 10-15s)";
             gameContainer.classList.add('hidden');
-            iframe.srcdoc = ""; // Purana game clear karna
+            iframe.srcdoc = ""; 
 
             try {
                 const base64Image = await compressImage(selectedFile);
@@ -160,26 +167,28 @@
                     throw new Error(data.detail || data.error || "Server Error");
                 }
 
-                // AI ka diya hua code iframe ke andar daalna
+                // Inject code into iframe
                 iframe.srcdoc = data.code;
                 gameContainer.classList.remove('hidden');
                 
-                // Screen ko thoda scroll down karna taaki game dikh jaye
+                // Smooth scroll to the game
                 setTimeout(() => {
                     gameContainer.scrollIntoView({ behavior: "smooth" });
                 }, 500);
 
             } catch (error) {
+                // Developer Log (Hidden from user)
                 console.error("Developer Debug Log:", error);
-                const errStr = error.message.toLowerCase();
                 
+                // 100% English User-facing errors
+                const errStr = error.message.toLowerCase();
                 if (errStr.includes('failed to fetch') || errStr.includes('networkerror')) {
-                    alert("🌐 Network Error: Backend se connect nahi ho paaya. Kya tune Render URL sahi se update kiya hai?");
+                    alert("🌐 Network Error: Unable to connect to the server. Please check your internet connection.");
                 } else {
-                    alert("⚠️ Oops! AI game generate nahi kar paaya. Ek aur baar try kar.");
+                    alert("⚠️ Oops! Something went wrong while spawning your game. Please try again later.");
                 }
             } finally {
-                // Button wapas normal karna
+                // Reset button
                 btnText.innerText = "Spawn Game 🚀";
                 genBtn.disabled = false;
                 genBtn.classList.remove('opacity-50', 'cursor-not-allowed');
