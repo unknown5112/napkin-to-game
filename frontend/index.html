@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Napkin-to-Game 🎮</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for game code later */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-sans flex flex-col items-center">
+
+    <div class="w-full max-w-3xl space-y-8">
+        
+        <!-- Header -->
+        <div class="text-center space-y-3 mt-4">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
+                Napkin-to-Game 🎮
+            </h1>
+            <p class="text-gray-400 text-sm md:text-base">
+                Sketch a game level, upload it, and let AI build a playable web game instantly.
+            </p>
+        </div>
+
+        <!-- Upload & Controls Section -->
+        <div class="bg-gray-800 p-6 md:p-8 rounded-2xl border border-gray-700 shadow-2xl">
+            
+            <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="previewImage(event)">
+            
+            <div class="flex gap-4 mb-6">
+                <button onclick="document.getElementById('imageInput').click()" 
+                    class="w-full py-3.5 bg-gray-700 hover:bg-gray-600 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-inner">
+                    📸 Upload Game Sketch
+                </button>
+            </div>
+            
+            <!-- Image Preview -->
+            <div id="previewContainer" class="hidden mb-6">
+                <img id="imagePreview" class="w-full max-h-72 object-contain rounded-xl border-2 border-dashed border-gray-600 bg-gray-900 p-2">
+            </div>
+
+            <!-- Generate Button -->
+            <button id="generateBtn" disabled 
+                class="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl opacity-50 cursor-not-allowed transition-all shadow-lg shadow-green-500/20">
+                Spawn Game 🚀
+            </button>
+        </div>
+
+        <!-- Game Output Section (Hidden initially) -->
+        <div id="gameContainer" class="hidden bg-gray-800 p-4 md:p-6 rounded-2xl border border-gray-700 shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4">
+                <h2 class="font-bold text-xl text-emerald-400 flex items-center gap-2">
+                    🕹️ Play Area
+                </h2>
+                <button class="text-sm bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-medium transition-colors">
+                    View Source Code
+                </button>
+            </div>
+            
+            <!-- Where the magic happens -->
+            <div class="relative w-full rounded-xl overflow-hidden bg-white border-2 border-gray-600" style="height: 60vh; min-height: 500px;">
+                <iframe id="gameFrame" class="absolute inset-0 w-full h-full border-0"></iframe>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Basic UI Logic (API calls will be added later) -->
+    <script>
+        let selectedFile = null;
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('previewContainer').classList.remove('hidden');
+                    
+                    const genBtn = document.getElementById('generateBtn');
+                    genBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    genBtn.disabled = false;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
