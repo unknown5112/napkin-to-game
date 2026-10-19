@@ -36,13 +36,15 @@ async def generate_game(request: GameRequest):
         print(f"🚨 Decode Error: {e}")
         raise HTTPException(status_code=400, detail="Invalid image format.")
 
+    # 🚀 YAHAN PROMPT UPDATE KIYA HAI MOBILE TOUCH KE LIYE
     prompt = """
     You are an expert game developer. Convert this hand-drawn sketch into a fully functional, playable 2D web game using HTML, CSS, and JavaScript. 
     1. Use the HTML5 <canvas> element or standard DOM elements.
-    2. Add basic physics, collision detection, and keyboard/mouse controls based on what the sketch implies (e.g., platformer, shooter, pong).
-    3. Make it colorful and engaging.
-    4. Ensure ALL CSS and JavaScript are inline within a single HTML file.
-    5. Return ONLY the valid HTML code starting with <!DOCTYPE html>. Do NOT include markdown formatting like ```html.
+    2. Add basic physics and collision detection based on what the sketch implies.
+    3. CRITICAL: Make the game MOBILE-FRIENDLY. You MUST implement touch controls (touchstart, touchend) or provide visible on-screen buttons for movement/jumping. Keyboard controls can be included as a fallback.
+    4. Make it colorful, engaging, and ensure the game canvas fits well within a mobile device screen layout.
+    5. Ensure ALL CSS and JavaScript are inline within a single HTML file.
+    6. Return ONLY the valid HTML code starting with <!DOCTYPE html>. Do NOT include markdown formatting like ```html.
     """
 
     for index, key in enumerate(API_KEYS):
@@ -50,7 +52,6 @@ async def generate_game(request: GameRequest):
             print(f"Trying API Key {index + 1}...")
             genai.configure(api_key=key)
             
-            # Bhai tere kehne par direct 3.5-flash set kar diya hai
             chosen_model = 'gemini-3.5-flash'
             print(f"🚀 Humne select kiya: {chosen_model}")
             
