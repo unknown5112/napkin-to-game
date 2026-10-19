@@ -50,19 +50,8 @@ async def generate_game(request: GameRequest):
             print(f"Trying API Key {index + 1}...")
             genai.configure(api_key=key)
             
-            # 🔍 Bhai tera idea: ListModels call karke sabse best available nikal rahe hain
-            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-            print(f"✅ Google allow kar raha hai yeh models: {available_models}")
-            
-            # Smart Model Fallback System
-            chosen_model = 'gemini-pro-vision' # Purana default
-            if 'models/gemini-1.5-flash-latest' in available_models:
-                chosen_model = 'gemini-1.5-flash-latest'
-            elif 'models/gemini-1.5-flash' in available_models:
-                chosen_model = 'gemini-1.5-flash'
-            elif 'models/gemini-1.5-pro' in available_models:
-                chosen_model = 'gemini-1.5-pro'
-
+            # Bhai tere kehne par direct 3.5-flash set kar diya hai
+            chosen_model = 'gemini-3.5-flash'
             print(f"🚀 Humne select kiya: {chosen_model}")
             
             model = genai.GenerativeModel(chosen_model)
